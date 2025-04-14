@@ -2,7 +2,6 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
-using System.Diagnostics;
 using System.ComponentModel;
 using System.Windows.Media;
 
@@ -10,9 +9,10 @@ namespace Laba1OOP
 {
     public partial class MainWindow : Window
     {
-        
+
 
         private bool isDrawing = false;
+        private bool isPoly = false;
         private float startX, startY;
         private List<MyShape> shapes;
         private List<MyShape> removedShapes;
@@ -34,7 +34,7 @@ namespace Laba1OOP
 
             if (!isDrawing)
             {
-                
+
                 if (string.IsNullOrEmpty(selectedShape)) return;
                 isDrawing = true;
                 removedShapes.Clear();
@@ -50,25 +50,42 @@ namespace Laba1OOP
                 }
                 else if (selectedShape == "Ellipse")
                 {
-                    currentShape = new EllipseShape(startX, startY, startX, startY,backgroundColor, strokeColor);
+                    currentShape = new EllipseShape(startX, startY, startX, startY, backgroundColor, strokeColor);
                 }
                 else if (selectedShape == "Line")
                 {
                     currentShape = new LineShape(startX, startY, startX, startY, backgroundColor, strokeColor);
                 }
+                else if (selectedShape == "Polyline")
+                {
+                    currentShape = new PolylineShape(startX, startY, backgroundColor, strokeColor);
+                }
+
+
+                if (selectedShape.StartsWith("Poly")){
+                    isPoly = true;
+                }
             }
             else
             {
-                isDrawing = false;
-                if (currentShape != null)
+                if (!isPoly)
                 {
-                    currentShape.Update(mouseX, mouseY);
-                    shapes.Add(currentShape);
-                   
-                }
-                RedrawCanvas();
-                UndoButton.IsEnabled = true;
+                    isDrawing = false;
+                    if (currentShape != null)
+                    {
+                        currentShape.Update(mouseX, mouseY);
+                        shapes.Add(currentShape);
 
+                    }
+                    RedrawCanvas();
+                    UndoButton.IsEnabled = true;
+                }
+                else
+                {
+                    
+                    
+                }
+            
             }
         }
 
@@ -88,7 +105,7 @@ namespace Laba1OOP
             {
                 currentShape.Update(endX, endY);
 
-                RedrawCanvas(); 
+                RedrawCanvas();
                 currentShape.Draw(MyCanvas);
             }
         }
@@ -146,7 +163,7 @@ namespace Laba1OOP
             RedrawCanvas();
             RedoButton.IsEnabled = true;
             DeactivateToogleButtons();
-            
+
         }
 
         private void DeactivateToogleButtons()
@@ -176,7 +193,7 @@ namespace Laba1OOP
                 }
                 else if (result == MessageBoxResult.Cancel)
                 {
-                    e.Cancel = true; 
+                    e.Cancel = true;
                 }
 
             }
@@ -212,7 +229,7 @@ namespace Laba1OOP
 
         private void ColorButton_Click(object sender, RoutedEventArgs e)
         {
-            Button button = sender as Button;
+            Button? button = sender as Button;
             if (button != null)
             {
                 BackColor.Background = button.Background;
@@ -221,7 +238,7 @@ namespace Laba1OOP
 
         private void StrokeButton_Click(object sender, RoutedEventArgs e)
         {
-            Button button = sender as Button;
+            Button? button = sender as Button;
             if (button != null)
             {
                 BackColor.BorderBrush = button.Background;
@@ -230,4 +247,3 @@ namespace Laba1OOP
     }
 
 }
-

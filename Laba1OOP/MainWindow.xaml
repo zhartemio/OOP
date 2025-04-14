@@ -84,7 +84,7 @@
         </Menu>
 
         <Canvas Name="MyCanvas" Background="White" Margin="50,10,50,22" Grid.Row="2" 
-                MouseMove="MyCanvas_MouseMove" MouseDown="MyCanvas_MouseDown"/>
+                MouseMove="MyCanvas_MouseMove" MouseLeftButtonDown="MyCanvas_MouseDown"  />
 
         <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left" 
                    Name="ShapeButtons" Width="215" Grid.Row="1">
@@ -94,6 +94,7 @@
                          Margin="0,0,10,0" Checked="HandleChecked" Unchecked="HandleUnchecked"/>
             <ToggleButton Content="Line" x:Name="LineButton" Width="40" Height="40" 
                          Margin="0,0,0,0" Checked="HandleChecked" Unchecked="HandleUnchecked"/>
+            <ToggleButton Content="Polyline" x:Name="PolilyneButton" Width="40" Height="40" Checked="HandleChecked" Unchecked="HandleUnchecked"/>
         </StackPanel>
 
         <StackPanel Margin="5,15,950,0" Orientation="Vertical" Grid.Row="1">
