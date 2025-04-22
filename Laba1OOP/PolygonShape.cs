@@ -4,12 +4,12 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-public class PolylineShape : MyShape
+public class PolygonShape : MyShape
 {
     private List<Point> points;
     private Point? tempPoint;
 
-    public PolylineShape(float startX, float startY, Brush backgroundColor, Brush strokeColor)
+    public PolygonShape(float startX, float startY, Brush backgroundColor, Brush strokeColor)
         : base(startX, startY, startX, startY, backgroundColor, strokeColor)
     {
         points = new List<Point>();
@@ -19,10 +19,8 @@ public class PolylineShape : MyShape
     public void AddPoint(float x, float y)
     {
         points.Add(new Point(x, y));
-        tempPoint = null; // сброс временной точки
+        tempPoint = null;
     }
-
-    
 
     public override void Update(float xRight, float yRight)
     {
@@ -31,24 +29,24 @@ public class PolylineShape : MyShape
 
     public override void Draw(Canvas canvas)
     {
-        var polyline = new Polyline
+        var polygon = new Polygon
         {
             Stroke = StrokeColor,
+            Fill = BackgroundColor,
             StrokeThickness = 2,
-            Fill = Brushes.Transparent,
             IsHitTestVisible = false
         };
 
         foreach (var point in points)
         {
-            polyline.Points.Add(point);
+            polygon.Points.Add(point);
         }
 
         if (tempPoint.HasValue)
         {
-            polyline.Points.Add(tempPoint.Value);
+            polygon.Points.Add(tempPoint.Value);
         }
 
-        canvas.Children.Add(polyline);
+        canvas.Children.Add(polygon);
     }
 }

@@ -84,17 +84,21 @@
         </Menu>
 
         <Canvas Name="MyCanvas" Background="White" Margin="50,10,50,22" Grid.Row="2" 
-                MouseMove="MyCanvas_MouseMove" MouseLeftButtonDown="MyCanvas_MouseDown"  />
+                MouseMove="MyCanvas_MouseMove" MouseDown="MyCanvas_MouseDown"/>
 
         <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left" 
-                   Name="ShapeButtons" Width="215" Grid.Row="1">
+                   Name="ShapeButtons" Width="240" Grid.Row="1">
             <ToggleButton Content="Ellipse" x:Name="EllipseButton" Width="40" Height="40" 
                          Margin="0,0,10,0" Checked="HandleChecked" Unchecked="HandleUnchecked"/>
             <ToggleButton Content="Rectangle" x:Name="RectangleButton" Width="40" Height="40" 
                          Margin="0,0,10,0" Checked="HandleChecked" Unchecked="HandleUnchecked"/>
             <ToggleButton Content="Line" x:Name="LineButton" Width="40" Height="40" 
-                         Margin="0,0,0,0" Checked="HandleChecked" Unchecked="HandleUnchecked"/>
-            <ToggleButton Content="Polyline" x:Name="PolilyneButton" Width="40" Height="40" Checked="HandleChecked" Unchecked="HandleUnchecked"/>
+                         Margin="0,0,10,0" Checked="HandleChecked" Unchecked="HandleUnchecked"/>
+            <ToggleButton Content="Polyline" x:Name="PolilyneButton" Width="40" Height="40" 
+                          Checked="HandleChecked" Unchecked="HandleUnchecked" Margin="0,0,10,0"/>
+            <ToggleButton Content="Polygon" x:Name="PoligonButton" Width="40" Height="40"
+                          Checked="HandleChecked" Unchecked="HandleUnchecked" />
+
         </StackPanel>
 
         <StackPanel Margin="5,15,950,0" Orientation="Vertical" Grid.Row="1">
@@ -105,7 +109,7 @@
         </StackPanel>
 
         <StackPanel x:Name="BackgroundColors" Width="100" Height="40" VerticalAlignment="Center" 
-                   HorizontalAlignment="Left" Grid.Row="1" Margin="207,12,0,0">
+                   HorizontalAlignment="Left" Grid.Row="1" Margin="300,12,0,0">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <Button Style="{StaticResource CircleButtonStyle}" Background="Blue" Tag="Blue" Click="ColorButton_Click"/>
                 <Button Style="{StaticResource CircleButtonStyle}" Background="Red" Tag="Red" Click="ColorButton_Click"/>
@@ -122,10 +126,10 @@
                 <Button Style="{StaticResource CircleButtonStyle}" Background="Black" Tag="Black" Click="ColorButton_Click"/>
             </StackPanel>
         </StackPanel>
-        <Button Style="{StaticResource CircleChosenColorStyle}" Background="Black" BorderBrush="Black" Name="BackColor" Grid.Row="1" Margin="312,26,633,15"/>
+        <Button Style="{StaticResource CircleChosenColorStyle}" Background="Black" BorderBrush="Black" Name="BackColor" Grid.Row="1" Margin="405,25,545,16"/>
 
         <StackPanel x:Name="StrkeColors" Width="96" Height="39" VerticalAlignment="Top" 
-           HorizontalAlignment="Left" Grid.Row="1" Margin="362,26,0,0">
+           HorizontalAlignment="Left" Grid.Row="1" Margin="450,26,0,0">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <Button Style="{StaticResource CircleButtonStyle}" Background="Blue" Tag="Blue" Click="StrokeButton_Click"/>
                 <Button Style="{StaticResource CircleButtonStyle}" Background="Red" Tag="Red" Click="StrokeButton_Click"/>

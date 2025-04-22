@@ -20,6 +20,7 @@ public abstract class MyShape
         BackgroundColor = backgroundColor;
         StrokeColor = strokeColor;
     }
-    public abstract void Draw(Canvas canvas);
-    public abstract void Update(float xRight, float yRight);
+    public abstract void Draw(Canvas canvas); // метод отрисовки фигуры
+
+    public abstract void Update(float xRight, float yRight); // метод обновления координат фигуры 
 }

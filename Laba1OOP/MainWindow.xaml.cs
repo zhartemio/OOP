@@ -9,8 +9,6 @@ namespace Laba1OOP
 {
     public partial class MainWindow : Window
     {
-
-
         private bool isDrawing = false;
         private bool isPoly = false;
         private float startX, startY;
@@ -32,10 +30,36 @@ namespace Laba1OOP
             float mouseX = (float)position.X;
             float mouseY = (float)position.Y;
 
+            if (e.ChangedButton == MouseButton.Right && isDrawing)
+            {
+                isDrawing = false;
+                if (currentShape != null)
+                {
+                    if (isPoly)
+                    {
+                        if (currentShape is PolylineShape polyline)
+                            polyline.AddPoint(mouseX, mouseY);
+                        else if (currentShape is PolygonShape polygon)
+                            polygon.AddPoint(mouseX, mouseY);
+                    }
+                    else
+                    {
+                        currentShape.Update(mouseX, mouseY);
+                    }
+
+                    shapes.Add(currentShape);
+                    currentShape = null;
+                    isPoly = false;
+                    RedrawCanvas();
+                    UndoButton.IsEnabled = true;
+                }
+                return;
+            }
+
             if (!isDrawing)
             {
-
                 if (string.IsNullOrEmpty(selectedShape)) return;
+
                 isDrawing = true;
                 removedShapes.Clear();
                 RedoButton.IsEnabled = false;
@@ -59,10 +83,11 @@ namespace Laba1OOP
                 else if (selectedShape == "Polyline")
                 {
                     currentShape = new PolylineShape(startX, startY, backgroundColor, strokeColor);
+                    isPoly = true;
                 }
-
-
-                if (selectedShape.StartsWith("Poly")){
+                else if (selectedShape == "Polygon")
+                {
+                    currentShape = new PolygonShape(startX, startY, backgroundColor, strokeColor);
                     isPoly = true;
                 }
             }
@@ -75,17 +100,26 @@ namespace Laba1OOP
                     {
                         currentShape.Update(mouseX, mouseY);
                         shapes.Add(currentShape);
-
+                        currentShape = null;
+                        RedrawCanvas();
+                        UndoButton.IsEnabled = true;
                     }
-                    RedrawCanvas();
-                    UndoButton.IsEnabled = true;
                 }
                 else
                 {
-                    
-                    
+                    if (currentShape is PolylineShape polyline)
+                    {
+                        polyline.AddPoint(mouseX, mouseY);
+                        RedrawCanvas();
+                        currentShape.Draw(MyCanvas);
+                    }
+                    else if (currentShape is PolygonShape polygon)
+                    {
+                        polygon.AddPoint(mouseX, mouseY);
+                        RedrawCanvas();
+                        currentShape.Draw(MyCanvas);
+                    }
                 }
-            
             }
         }
 
@@ -101,16 +135,14 @@ namespace Laba1OOP
             endX = Math.Max(0, Math.Min(endX, (float)MyCanvas.ActualWidth));
             endY = Math.Max(0, Math.Min(endY, (float)MyCanvas.ActualHeight));
 
+            RedrawCanvas();
+
             if (currentShape != null)
             {
                 currentShape.Update(endX, endY);
-
-                RedrawCanvas();
                 currentShape.Draw(MyCanvas);
             }
         }
-
-
 
         private void RedrawCanvas()
         {
@@ -163,7 +195,6 @@ namespace Laba1OOP
             RedrawCanvas();
             RedoButton.IsEnabled = true;
             DeactivateToogleButtons();
-
         }
 
         private void DeactivateToogleButtons()
@@ -189,25 +220,23 @@ namespace Laba1OOP
 
                 if (result == MessageBoxResult.Yes)
                 {
-
+                    // Реализация сохранения здесь
                 }
                 else if (result == MessageBoxResult.Cancel)
                 {
                     e.Cancel = true;
                 }
-
             }
         }
 
         private void SaveShapesToFile()
         {
-
+            // Реализация сохранения фигур
         }
-
 
         private void LoadButton_Click(object sender, RoutedEventArgs e)
         {
-
+            // Загрузка фигур
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
@@ -220,12 +249,10 @@ namespace Laba1OOP
             SaveShapesToFile();
         }
 
-
         private void HandleUnchecked(object sender, RoutedEventArgs e)
         {
             selectedShape = "";
         }
-
 
         private void ColorButton_Click(object sender, RoutedEventArgs e)
         {
@@ -245,5 +272,4 @@ namespace Laba1OOP
             }
         }
     }
-
 }
