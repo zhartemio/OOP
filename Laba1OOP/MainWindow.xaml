@@ -126,7 +126,7 @@
                 <Button Style="{StaticResource CircleButtonStyle}" Background="Black" Tag="Black" Click="ColorButton_Click"/>
             </StackPanel>
         </StackPanel>
-        <Button Style="{StaticResource CircleChosenColorStyle}" Background="Black" BorderBrush="Black" Name="BackColor" Grid.Row="1" Margin="405,25,545,16"/>
+        <Button Style="{StaticResource CircleChosenColorStyle}" Background="Red" BorderBrush="Black" BorderThickness="4.0" x:Name="BackColor" Grid.Row="1" Margin="400,25,545,16"/>
 
         <StackPanel x:Name="StrkeColors" Width="96" Height="39" VerticalAlignment="Top" 
            HorizontalAlignment="Left" Grid.Row="1" Margin="450,26,0,0">
@@ -146,5 +146,37 @@
                 <Button Style="{StaticResource CircleButtonStyle}" Background="Black" Tag="Black" Click="StrokeButton_Click"/>
             </StackPanel>
         </StackPanel>
+        <ComboBox VerticalAlignment="Center" Grid.Row="1" Width="150" Margin="270,0,0,0" SelectionChanged="ComboBox_SelectionChanged" x:Name="StrokeThicknessComboBox">
+            <ComboBoxItem Tag="1">
+                <StackPanel Orientation="Horizontal">
+                    <Line X1="0" Y1="0" X2="80" Y2="0" Stroke="Black" StrokeThickness="1" VerticalAlignment="Center"/>
+                    <TextBlock Text="  1 px" VerticalAlignment="Center"/>
+                </StackPanel>
+            </ComboBoxItem>
+            <ComboBoxItem Tag="2">
+                <StackPanel Orientation="Horizontal">
+                    <Line X1="0" Y1="0" X2="80" Y2="0" Stroke="Black" StrokeThickness="2" VerticalAlignment="Center"/>
+                    <TextBlock Text="  2 px" VerticalAlignment="Center"/>
+                </StackPanel>
+            </ComboBoxItem>
+            <ComboBoxItem Tag="4">
+                <StackPanel Orientation="Horizontal">
+                    <Line X1="0" Y1="0" X2="80" Y2="0" Stroke="Black" StrokeThickness="4" VerticalAlignment="Center"/>
+                    <TextBlock Text="  4 px" VerticalAlignment="Center"/>
+                </StackPanel>
+            </ComboBoxItem>
+            <ComboBoxItem Tag="6">
+                <StackPanel Orientation="Horizontal">
+                    <Line X1="0" Y1="0" X2="80" Y2="0" Stroke="Black" StrokeThickness="6" VerticalAlignment="Center"/>
+                    <TextBlock Text="  6 px" VerticalAlignment="Center"/>
+                </StackPanel>
+            </ComboBoxItem>
+            <ComboBoxItem Tag="8">
+                <StackPanel Orientation="Horizontal">
+                    <Line X1="0" Y1="0" X2="80" Y2="0" Stroke="Black" StrokeThickness="8" VerticalAlignment="Center"/>
+                    <TextBlock Text="  8 px" VerticalAlignment="Center"/>
+                </StackPanel>
+            </ComboBoxItem>
+        </ComboBox>
     </Grid>
 </Window>

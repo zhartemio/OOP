@@ -10,49 +10,53 @@ namespace Laba1OOP
     public partial class MainWindow : Window
     {
         private bool isDrawing = false;
-        private bool isPoly = false;
         private float startX, startY;
-        private List<MyShape> shapes;
-        private List<MyShape> removedShapes;
-        private MyShape currentShape;
+        private List<MyShape> shapes = new();
+        private List<MyShape> removedShapes = new();
+        private MyShape? currentShape;
         private string selectedShape = "";
+        private double thickness;
+        private Dictionary<string, Func<float, float, Brush, Brush, double, MyShape>> shapeCreators;
 
         public MainWindow()
         {
             InitializeComponent();
-            shapes = new List<MyShape>();
-            removedShapes = new List<MyShape>();
+
+            StrokeThicknessComboBox.SelectedIndex = 0;
+
+            shapeCreators = new Dictionary<string, Func<float, float, Brush, Brush, double, MyShape>>
+            {
+                ["Rectangle"] = (x, y, fill, stroke, th) => new RectangleShape(x, y, x, y, fill, stroke, th),
+                ["Ellipse"]   = (x, y, fill, stroke, th) => new EllipseShape(x, y, x, y, fill, stroke, th),
+                ["Line"]      = (x, y, fill, stroke, th) => new LineShape(x, y, x, y, fill, stroke, th),
+                ["Polyline"]  = (x, y, fill, stroke, th) => new PolylineShape(x, y, fill, stroke, th),
+                ["Polygon"]   = (x, y, fill, stroke, th) => new PolygonShape(x, y, fill, stroke, th)
+            };
         }
 
         private void MyCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            var position = e.GetPosition(MyCanvas);
-            float mouseX = (float)position.X;
-            float mouseY = (float)position.Y;
+            var pos = e.GetPosition(MyCanvas);
+            float mouseX = (float)pos.X;
+            float mouseY = (float)pos.Y;
 
-            if (e.ChangedButton == MouseButton.Right && isDrawing)
+            if (e.ChangedButton == MouseButton.Right && isDrawing && currentShape != null)
             {
                 isDrawing = false;
-                if (currentShape != null)
-                {
-                    if (isPoly)
-                    {
-                        if (currentShape is PolylineShape polyline)
-                            polyline.AddPoint(mouseX, mouseY);
-                        else if (currentShape is PolygonShape polygon)
-                            polygon.AddPoint(mouseX, mouseY);
-                    }
-                    else
-                    {
-                        currentShape.Update(mouseX, mouseY);
-                    }
 
-                    shapes.Add(currentShape);
-                    currentShape = null;
-                    isPoly = false;
-                    RedrawCanvas();
-                    UndoButton.IsEnabled = true;
+                if (currentShape.IsMultiPoint)
+                {
+                    currentShape.AddPoint(mouseX, mouseY);
                 }
+                else
+                {
+                    currentShape.Update(mouseX, mouseY);
+                }
+
+                shapes.Add(currentShape);
+                currentShape = null;
+                RedrawCanvas();
+                UndoButton.IsEnabled = true;
                 return;
             }
 
@@ -63,85 +67,50 @@ namespace Laba1OOP
                 isDrawing = true;
                 removedShapes.Clear();
                 RedoButton.IsEnabled = false;
+
                 startX = mouseX;
                 startY = mouseY;
-                Brush backgroundColor = BackColor.Background;
-                Brush strokeColor = BackColor.BorderBrush;
 
-                if (selectedShape == "Rectangle")
+                Brush bg = BackColor.Background;
+                Brush stroke = BackColor.BorderBrush;
+
+                if (shapeCreators.TryGetValue(selectedShape, out var factory))
                 {
-                    currentShape = new RectangleShape(startX, startY, startX, startY, backgroundColor, strokeColor);
-                }
-                else if (selectedShape == "Ellipse")
-                {
-                    currentShape = new EllipseShape(startX, startY, startX, startY, backgroundColor, strokeColor);
-                }
-                else if (selectedShape == "Line")
-                {
-                    currentShape = new LineShape(startX, startY, startX, startY, backgroundColor, strokeColor);
-                }
-                else if (selectedShape == "Polyline")
-                {
-                    currentShape = new PolylineShape(startX, startY, backgroundColor, strokeColor);
-                    isPoly = true;
-                }
-                else if (selectedShape == "Polygon")
-                {
-                    currentShape = new PolygonShape(startX, startY, backgroundColor, strokeColor);
-                    isPoly = true;
+                    currentShape = factory(mouseX, mouseY, bg, stroke, thickness);
                 }
             }
-            else
+            else if (currentShape != null)
             {
-                if (!isPoly)
+                if (currentShape.IsMultiPoint)
                 {
-                    isDrawing = false;
-                    if (currentShape != null)
-                    {
-                        currentShape.Update(mouseX, mouseY);
-                        shapes.Add(currentShape);
-                        currentShape = null;
-                        RedrawCanvas();
-                        UndoButton.IsEnabled = true;
-                    }
+                    currentShape.AddPoint(mouseX, mouseY);
+                    RedrawCanvas();
+                    currentShape.Draw(MyCanvas);
                 }
                 else
                 {
-                    if (currentShape is PolylineShape polyline)
-                    {
-                        polyline.AddPoint(mouseX, mouseY);
-                        RedrawCanvas();
-                        currentShape.Draw(MyCanvas);
-                    }
-                    else if (currentShape is PolygonShape polygon)
-                    {
-                        polygon.AddPoint(mouseX, mouseY);
-                        RedrawCanvas();
-                        currentShape.Draw(MyCanvas);
-                    }
+                    isDrawing = false;
+                    currentShape.Update(mouseX, mouseY);
+                    shapes.Add(currentShape);
+                    currentShape = null;
+                    RedrawCanvas();
+                    UndoButton.IsEnabled = true;
                 }
             }
         }
 
         private void MyCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (!isDrawing)
-                return;
+            if (!isDrawing || currentShape == null) return;
 
-            var position = e.GetPosition(MyCanvas);
-            float endX = (float)position.X;
-            float endY = (float)position.Y;
-
-            endX = Math.Max(0, Math.Min(endX, (float)MyCanvas.ActualWidth));
-            endY = Math.Max(0, Math.Min(endY, (float)MyCanvas.ActualHeight));
+            var pos = e.GetPosition(MyCanvas);
+            float endX = Math.Clamp((float)pos.X, 0, (float)MyCanvas.ActualWidth);
+            float endY = Math.Clamp((float)pos.Y, 0, (float)MyCanvas.ActualHeight);
 
             RedrawCanvas();
 
-            if (currentShape != null)
-            {
-                currentShape.Update(endX, endY);
-                currentShape.Draw(MyCanvas);
-            }
+            currentShape.Update(endX, endY);
+            currentShape.Draw(MyCanvas);
         }
 
         private void RedrawCanvas()
@@ -157,9 +126,7 @@ namespace Laba1OOP
         {
             if (sender is ToggleButton currentButton && currentButton.IsChecked == true)
             {
-                StackPanel shapeButtons = ShapeButtons;
-
-                foreach (var child in shapeButtons.Children)
+                foreach (var child in ShapeButtons.Children)
                 {
                     if (child is ToggleButton toggleButton && toggleButton != currentButton)
                     {
@@ -171,29 +138,56 @@ namespace Laba1OOP
             }
         }
 
+        private void HandleUnchecked(object sender, RoutedEventArgs e)
+        {
+            selectedShape = "";
+        }
+
+        private void ColorButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button)
+                BackColor.Background = button.Background;
+        }
+
+        private void StrokeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button)
+                BackColor.BorderBrush = button.Background;
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ComboBox box &&
+                box.SelectedItem is ComboBoxItem item &&
+                double.TryParse(item.Tag?.ToString(), out double strokeThickness))
+            {
+                thickness = strokeThickness;
+            }
+        }
+
         private void RedoButton_Click(object sender, RoutedEventArgs e)
         {
+            if (removedShapes.Count == 0) return;
+
             shapes.Add(removedShapes.Last());
-            removedShapes.Remove(removedShapes.Last());
-            if (removedShapes.Count == 0)
-            {
-                RedoButton.IsEnabled = false;
-            }
+            removedShapes.RemoveAt(removedShapes.Count - 1);
+
             RedrawCanvas();
             UndoButton.IsEnabled = true;
+            RedoButton.IsEnabled = removedShapes.Count > 0;
             DeactivateToogleButtons();
         }
 
         private void UndoButton_Click(object sender, RoutedEventArgs e)
         {
+            if (shapes.Count == 0) return;
+
             removedShapes.Add(shapes.Last());
-            shapes.Remove(shapes.Last());
-            if (shapes.Count == 0)
-            {
-                UndoButton.IsEnabled = false;
-            }
+            shapes.RemoveAt(shapes.Count - 1);
+
             RedrawCanvas();
             RedoButton.IsEnabled = true;
+            UndoButton.IsEnabled = shapes.Count > 0;
             DeactivateToogleButtons();
         }
 
@@ -210,66 +204,36 @@ namespace Laba1OOP
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if (shapes.Count > 0)
-            {
-                MessageBoxResult result = MessageBox.Show(
-                    "Вы желаете сохранить фигуры перед закрытием окна?",
-                    "Сохранение",
-                    MessageBoxButton.YesNoCancel,
-                    MessageBoxImage.Question);
+            if (shapes.Count == 0) return;
 
-                if (result == MessageBoxResult.Yes)
-                {
-                    // Реализация сохранения здесь
-                }
-                else if (result == MessageBoxResult.Cancel)
-                {
-                    e.Cancel = true;
-                }
+            var result = MessageBox.Show(
+                "Вы желаете сохранить фигуры перед закрытием окна?",
+                "Сохранение",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Cancel)
+            {
+                e.Cancel = true;
             }
+            else if (result == MessageBoxResult.Yes)
+            {
+                SaveShapesToFile();
+            }
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e) => SaveShapesToFile();
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e) => Close();
+
+        private void LoadButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Загрузка фигур (реализация по желанию)
         }
 
         private void SaveShapesToFile()
         {
-            // Реализация сохранения фигур
-        }
-
-        private void LoadButton_Click(object sender, RoutedEventArgs e)
-        {
-            // Загрузка фигур
-        }
-
-        private void ExitButton_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
-        {
-            SaveShapesToFile();
-        }
-
-        private void HandleUnchecked(object sender, RoutedEventArgs e)
-        {
-            selectedShape = "";
-        }
-
-        private void ColorButton_Click(object sender, RoutedEventArgs e)
-        {
-            Button? button = sender as Button;
-            if (button != null)
-            {
-                BackColor.Background = button.Background;
-            }
-        }
-
-        private void StrokeButton_Click(object sender, RoutedEventArgs e)
-        {
-            Button? button = sender as Button;
-            if (button != null)
-            {
-                BackColor.BorderBrush = button.Background;
-            }
+            // Сохранение фигур (реализация по желанию)
         }
     }
 }

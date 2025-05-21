@@ -1,28 +1,28 @@
-﻿using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows;
+
 
 public class PolylineShape : MyShape
 {
     private List<Point> points;
     private Point? tempPoint;
 
-    public PolylineShape(float startX, float startY, Brush backgroundColor, Brush strokeColor)
-        : base(startX, startY, startX, startY, backgroundColor, strokeColor)
+    public PolylineShape(float x1, float y1, Brush backgroundColor, Brush strokeColor, double strokeThickness)
+        : base(x1, y1, backgroundColor, strokeColor, strokeThickness)
     {
         points = new List<Point>();
-        points.Add(new Point(startX, startY));
+        points.Add(new Point(x1, y1));
     }
 
-    public void AddPoint(float x, float y)
+    public override bool IsMultiPoint => true;
+
+    public override void AddPoint(float x, float y)
     {
         points.Add(new Point(x, y));
-        tempPoint = null; // сброс временной точки
+        tempPoint = null;
     }
-
-    
 
     public override void Update(float xRight, float yRight)
     {
@@ -34,7 +34,7 @@ public class PolylineShape : MyShape
         var polyline = new Polyline
         {
             Stroke = StrokeColor,
-            StrokeThickness = 2,
+            StrokeThickness = StrokeThickness,
             Fill = Brushes.Transparent,
             IsHitTestVisible = false
         };
