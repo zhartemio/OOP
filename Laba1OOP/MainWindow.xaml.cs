@@ -1,8 +1,11 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Controls.Primitives;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Laba1OOP
@@ -11,11 +14,16 @@ namespace Laba1OOP
     {
         private bool isDrawing = false;
         private float startX, startY;
+
         private List<MyShape> shapes = new();
         private List<MyShape> removedShapes = new();
+
+        private UndoRedoManager<MyShape> undoRedoManager;
+
         private MyShape? currentShape;
         private string selectedShape = "";
         private double thickness;
+
         private Dictionary<string, Func<float, float, Brush, Brush, double, MyShape>> shapeCreators;
 
         public MainWindow()
@@ -23,6 +31,8 @@ namespace Laba1OOP
             InitializeComponent();
 
             StrokeThicknessComboBox.SelectedIndex = 0;
+
+            undoRedoManager = new UndoRedoManager<MyShape>(shapes, removedShapes);
 
             shapeCreators = new Dictionary<string, Func<float, float, Brush, Brush, double, MyShape>>
             {
@@ -32,6 +42,8 @@ namespace Laba1OOP
                 ["Polyline"]  = (x, y, fill, stroke, th) => new PolylineShape(x, y, fill, stroke, th),
                 ["Polygon"]   = (x, y, fill, stroke, th) => new PolygonShape(x, y, fill, stroke, th)
             };
+
+            UpdateUndoRedoButtons();
         }
 
         private void MyCanvas_MouseDown(object sender, MouseButtonEventArgs e)
@@ -53,10 +65,10 @@ namespace Laba1OOP
                     currentShape.Update(mouseX, mouseY);
                 }
 
-                shapes.Add(currentShape);
+                undoRedoManager.Add(currentShape);
                 currentShape = null;
                 RedrawCanvas();
-                UndoButton.IsEnabled = true;
+                UpdateUndoRedoButtons();
                 return;
             }
 
@@ -65,7 +77,9 @@ namespace Laba1OOP
                 if (string.IsNullOrEmpty(selectedShape)) return;
 
                 isDrawing = true;
-                removedShapes.Clear();
+
+                // Начинаем новое действие — очищаем redo через UndoRedoManager
+                removedShapes.Clear(); // либо добавить метод в UndoRedoManager, если хочешь
                 RedoButton.IsEnabled = false;
 
                 startX = mouseX;
@@ -91,10 +105,10 @@ namespace Laba1OOP
                 {
                     isDrawing = false;
                     currentShape.Update(mouseX, mouseY);
-                    shapes.Add(currentShape);
+                    undoRedoManager.Add(currentShape);
                     currentShape = null;
                     RedrawCanvas();
-                    UndoButton.IsEnabled = true;
+                    UpdateUndoRedoButtons();
                 }
             }
         }
@@ -167,31 +181,27 @@ namespace Laba1OOP
 
         private void RedoButton_Click(object sender, RoutedEventArgs e)
         {
-            if (removedShapes.Count == 0) return;
-
-            shapes.Add(removedShapes.Last());
-            removedShapes.RemoveAt(removedShapes.Count - 1);
-
+            undoRedoManager.Redo();
             RedrawCanvas();
-            UndoButton.IsEnabled = true;
-            RedoButton.IsEnabled = removedShapes.Count > 0;
-            DeactivateToogleButtons();
+            UpdateUndoRedoButtons();
+            DeactivateToggleButtons();
         }
 
         private void UndoButton_Click(object sender, RoutedEventArgs e)
         {
-            if (shapes.Count == 0) return;
-
-            removedShapes.Add(shapes.Last());
-            shapes.RemoveAt(shapes.Count - 1);
-
+            undoRedoManager.Undo();
             RedrawCanvas();
-            RedoButton.IsEnabled = true;
-            UndoButton.IsEnabled = shapes.Count > 0;
-            DeactivateToogleButtons();
+            UpdateUndoRedoButtons();
+            DeactivateToggleButtons();
         }
 
-        private void DeactivateToogleButtons()
+        private void UpdateUndoRedoButtons()
+        {
+            UndoButton.IsEnabled = undoRedoManager.CanUndo;
+            RedoButton.IsEnabled = undoRedoManager.CanRedo;
+        }
+
+        private void DeactivateToggleButtons()
         {
             foreach (var child in ShapeButtons.Children)
             {
@@ -228,12 +238,12 @@ namespace Laba1OOP
 
         private void LoadButton_Click(object sender, RoutedEventArgs e)
         {
-            // Загрузка фигур (реализация по желанию)
+            // Реализация загрузки фигур по желанию
         }
 
         private void SaveShapesToFile()
         {
-            // Сохранение фигур (реализация по желанию)
+            // Реализация сохранения фигур по желанию
         }
     }
 }
