@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
+using Laba1OOP.Classes.Managers;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -19,6 +19,8 @@ namespace Laba1OOP
         private List<MyShape> removedShapes = new();
 
         private UndoRedoManager<MyShape> undoRedoManager;
+        private FileManager<MyShape> fileManager;
+
 
         private MyShape? currentShape;
         private string selectedShape = "";
@@ -33,6 +35,7 @@ namespace Laba1OOP
             StrokeThicknessComboBox.SelectedIndex = 0;
 
             undoRedoManager = new UndoRedoManager<MyShape>(shapes, removedShapes);
+            fileManager = new FileManager<MyShape>(shapes);
 
             shapeCreators = new Dictionary<string, Func<float, float, Brush, Brush, double, MyShape>>
             {
@@ -78,8 +81,7 @@ namespace Laba1OOP
 
                 isDrawing = true;
 
-                // Начинаем новое действие — очищаем redo через UndoRedoManager
-                removedShapes.Clear(); // либо добавить метод в UndoRedoManager, если хочешь
+                removedShapes.Clear();
                 RedoButton.IsEnabled = false;
 
                 startX = mouseX;
@@ -232,18 +234,25 @@ namespace Laba1OOP
             }
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e) => SaveShapesToFile();
+        private void SaveButton_Click(object sender, RoutedEventArgs e) {
+            fileManager.SaveElementsToFile();
+        }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e) => Close();
 
-        private void LoadButton_Click(object sender, RoutedEventArgs e)
-        {
-            // Реализация загрузки фигур по желанию
-        }
-
         private void SaveShapesToFile()
         {
-            // Реализация сохранения фигур по желанию
+            fileManager.SaveElementsToFile();
         }
+
+        private void LoadButton_Click(object sender, RoutedEventArgs e)
+        {
+            shapes.Clear();
+            removedShapes.Clear();
+            fileManager.LoadElementsFromFile();
+            RedrawCanvas();
+            UpdateUndoRedoButtons();
+        }
+
     }
 }

@@ -1,0 +1,35 @@
+{
+  "$type": "System.Collections.Generic.List`1[[MyShape, Laba1OOP]], System.Private.CoreLib",
+  "$values": [
+    {
+      "$type": "EllipseShape, Laba1OOP",
+      "X2": 305.5,
+      "Y2": 283.5,
+      "X1": 168.5,
+      "Y1": 165.5,
+      "BackgroundColor": "#FFFF0000",
+      "StrokeColor": "#FF000000",
+      "StrokeThickness": 1.0,
+      "IsMultiPoint": false
+    },
+    {
+      "$type": "PolygonShape, Laba1OOP",
+      "Points": {
+        "$type": "System.Collections.Generic.List`1[[System.Windows.Point, WindowsBase]], System.Private.CoreLib",
+        "$values": [
+          "291,56",
+          "469,189",
+          "513,451",
+          "266.5,463",
+          "729.5,277.5"
+        ]
+      },
+      "IsMultiPoint": true,
+      "X1": 291.0,
+      "Y1": 56.0,
+      "BackgroundColor": "#FFFF0000",
+      "StrokeColor": "#FF000000",
+      "StrokeThickness": 1.0
+    }
+  ]
+}

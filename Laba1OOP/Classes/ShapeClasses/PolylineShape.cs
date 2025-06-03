@@ -1,26 +1,26 @@
-﻿using System.Windows.Controls;
+﻿using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Windows;
-
 
 public class PolylineShape : MyShape
 {
-    private List<Point> points;
+    public List<Point> Points { get; set; } = new List<Point>(); 
+
     private Point? tempPoint;
 
     public PolylineShape(float x1, float y1, Brush backgroundColor, Brush strokeColor, double strokeThickness)
         : base(x1, y1, backgroundColor, strokeColor, strokeThickness)
     {
-        points = new List<Point>();
-        points.Add(new Point(x1, y1));
+        Points.Add(new Point(x1, y1));
     }
 
     public override bool IsMultiPoint => true;
 
     public override void AddPoint(float x, float y)
     {
-        points.Add(new Point(x, y));
+        Points.Add(new Point(x, y)); 
         tempPoint = null;
     }
 
@@ -39,7 +39,7 @@ public class PolylineShape : MyShape
             IsHitTestVisible = false
         };
 
-        foreach (var point in points)
+        foreach (var point in Points) 
         {
             polyline.Points.Add(point);
         }

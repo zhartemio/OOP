@@ -2,25 +2,25 @@
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows;
-
+using System.Collections.Generic;
 
 public class PolygonShape : MyShape
 {
-    private List<Point> points;
+    public List<Point> Points { get; set; } = new List<Point>(); 
+
     private Point? tempPoint;
 
     public PolygonShape(float x1, float y1, Brush backgroundColor, Brush strokeColor, double strokeThickness)
         : base(x1, y1, backgroundColor, strokeColor, strokeThickness)
     {
-        points = new List<Point>();
-        points.Add(new Point(x1, y1));
+        Points.Add(new Point(x1, y1)); 
     }
 
     public override bool IsMultiPoint => true;
 
     public override void AddPoint(float x, float y)
     {
-        points.Add(new Point(x, y));
+        Points.Add(new Point(x, y)); 
         tempPoint = null;
     }
 
@@ -39,7 +39,7 @@ public class PolygonShape : MyShape
             IsHitTestVisible = false
         };
 
-        foreach (var point in points)
+        foreach (var point in Points) 
         {
             polygon.Points.Add(point);
         }
