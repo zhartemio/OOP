@@ -65,6 +65,10 @@
     </Window.Resources>
 
     <Grid Background="LightGray" Name="MyGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="669*"/>
+            <ColumnDefinition Width="332*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
 
             <!-- Для Menu -->
@@ -74,17 +78,18 @@
         </Grid.RowDefinitions>
 
         <!-- Menu в первой строке Grid -->
-        <Menu Grid.Row="0" Height="30">
+        <Menu Grid.Row="0" Height="30" Grid.ColumnSpan="2" Margin="0,0,0,71" Grid.RowSpan="2">
             <MenuItem Header="Файл">
                 <MenuItem x:Name="SaveButton" Header="Сохранить" Click="SaveButton_Click"/>
                 <MenuItem x:Name="LoadButton" Header="Загрузить" Click="LoadButton_Click"/>
+                <MenuItem x:Name="LoadPluginMenuItem" Header="Загрузить плагин" Click="LoadPlugin_Click"/>
                 <Separator/>
                 <MenuItem x:Name="ExitButton" Header="Выход" Click="ExitButton_Click"/>
             </MenuItem>
         </Menu>
 
         <Canvas Name="MyCanvas" Background="White" Margin="50,10,50,22" Grid.Row="2" 
-                MouseMove="MyCanvas_MouseMove" MouseDown="MyCanvas_MouseDown"/>
+                MouseMove="MyCanvas_MouseMove" MouseDown="MyCanvas_MouseDown" Grid.ColumnSpan="2"/>
 
         <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left" 
                    Name="ShapeButtons" Width="240" Grid.Row="1">
@@ -101,15 +106,15 @@
 
         </StackPanel>
 
-        <StackPanel Margin="5,15,950,0" Orientation="Vertical" Grid.Row="1">
+        <StackPanel Margin="5,15,618,0" Orientation="Vertical" Grid.Row="1">
             <Button Content="Undo" x:Name="UndoButton" Width="30" Height="30" 
                    IsEnabled="False" Click="UndoButton_Click"/>
             <Button Content="Redo" x:Name="RedoButton" Width="30" Height="30" 
                    Margin="0,3" IsEnabled="False" Click="RedoButton_Click"/>
         </StackPanel>
 
-        <StackPanel x:Name="BackgroundColors" Width="100" Height="40" VerticalAlignment="Center" 
-                   HorizontalAlignment="Left" Grid.Row="1" Margin="300,12,0,0">
+        <StackPanel x:Name="BackgroundColors" Width="100" Height="40" VerticalAlignment="Top" 
+                   HorizontalAlignment="Left" Grid.Row="1" Margin="300,26,0,0">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <Button Style="{StaticResource CircleButtonStyle}" Background="Blue" Tag="Blue" Click="ColorButton_Click"/>
                 <Button Style="{StaticResource CircleButtonStyle}" Background="Red" Tag="Red" Click="ColorButton_Click"/>
@@ -126,7 +131,7 @@
                 <Button Style="{StaticResource CircleButtonStyle}" Background="Black" Tag="Black" Click="ColorButton_Click"/>
             </StackPanel>
         </StackPanel>
-        <Button Style="{StaticResource CircleChosenColorStyle}" Background="Red" BorderBrush="Black" BorderThickness="4.0" x:Name="BackColor" Grid.Row="1" Margin="400,25,545,16"/>
+        <Button Style="{StaticResource CircleChosenColorStyle}" Background="Red" BorderBrush="Black" BorderThickness="4.0" x:Name="BackColor" Grid.Row="1" Margin="400,28,224,19"/>
 
         <StackPanel x:Name="StrkeColors" Width="96" Height="39" VerticalAlignment="Top" 
            HorizontalAlignment="Left" Grid.Row="1" Margin="450,26,0,0">
@@ -146,7 +151,11 @@
                 <Button Style="{StaticResource CircleButtonStyle}" Background="Black" Tag="Black" Click="StrokeButton_Click"/>
             </StackPanel>
         </StackPanel>
-        <ComboBox VerticalAlignment="Center" Grid.Row="1" Width="150" Margin="270,0,0,0" SelectionChanged="ComboBox_SelectionChanged" x:Name="StrokeThicknessComboBox">
+        <StackPanel Orientation="Horizontal" Margin="75,10,0,0" HorizontalAlignment="Left" 
+            x:Name="PluginPanel" Width="232" Grid.Row="1" Grid.Column="1">
+        </StackPanel>
+
+        <ComboBox VerticalAlignment="Center" Grid.Row="1" Width="150" Margin="560,0,290,0" SelectionChanged="ComboBox_SelectionChanged" x:Name="StrokeThicknessComboBox" Grid.ColumnSpan="2">
             <ComboBoxItem Tag="1">
                 <StackPanel Orientation="Horizontal">
                     <Line X1="0" Y1="0" X2="80" Y2="0" Stroke="Black" StrokeThickness="1" VerticalAlignment="Center"/>

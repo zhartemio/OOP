@@ -1,7 +1,10 @@
 ﻿
+using Laba1OOP.Classes.AbstractClasses;
 using Laba1OOP.Classes.Managers;
+using Microsoft.Win32;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -14,9 +17,12 @@ namespace Laba1OOP
     {
         private bool isDrawing = false;
         private float startX, startY;
+        private int pluginCount = 0;
 
         private List<MyShape> shapes = new();
         private List<MyShape> removedShapes = new();
+
+        private IShapePlugin currentPlugin;
 
         private UndoRedoManager<MyShape> undoRedoManager;
         private FileManager<MyShape> fileManager;
@@ -89,6 +95,7 @@ namespace Laba1OOP
 
                 Brush bg = BackColor.Background;
                 Brush stroke = BackColor.BorderBrush;
+                string selected = selectedShape;
 
                 if (shapeCreators.TryGetValue(selectedShape, out var factory))
                 {
@@ -143,6 +150,13 @@ namespace Laba1OOP
             if (sender is ToggleButton currentButton && currentButton.IsChecked == true)
             {
                 foreach (var child in ShapeButtons.Children)
+                {
+                    if (child is ToggleButton toggleButton && toggleButton != currentButton)
+                    {
+                        toggleButton.IsChecked = false;
+                    }
+                }
+                foreach (var child in PluginPanel.Children)
                 {
                     if (child is ToggleButton toggleButton && toggleButton != currentButton)
                     {
@@ -234,7 +248,8 @@ namespace Laba1OOP
             }
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e) {
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
             fileManager.SaveElementsToFile();
         }
 
@@ -253,6 +268,63 @@ namespace Laba1OOP
             RedrawCanvas();
             UpdateUndoRedoButtons();
         }
+
+
+
+        public void LoadPlugin_Click(object s, RoutedEventArgs e)
+        {
+
+            if (pluginCount == 3) return;
+            var dialog = new OpenFileDialog
+            {
+                Filter = "DLL файлы (*.dll)|*.dll"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                string path = dialog.FileName;
+                Assembly assembly = Assembly.LoadFrom(path);
+
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (typeof(IShapePlugin).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+                    {
+                        IShapePlugin plugin = (IShapePlugin)Activator.CreateInstance(type);
+                        shapeCreators[plugin.Name] = (x, y, fill, stroke, thickness) =>
+                            plugin.CreateShape(x, y, fill, stroke, thickness);
+                        AddPluginButton(plugin);
+                    }
+                }
+            }
+            pluginCount++;
+        }
+        private void AddPluginButton(IShapePlugin plugin)
+        {
+            var button = new ToggleButton
+            {
+                Content = plugin.Name,
+                Width = 40,
+                Height = 40,
+                Margin = new Thickness(5)
+            };
+
+            button.Checked += (s, e) =>
+            {
+                currentPlugin = plugin;
+                HandleChecked(s, e);
+                
+                button.IsChecked = true;
+            };
+
+            button.Unchecked += (s, e) =>
+            {
+                if (currentPlugin == plugin)
+                    currentPlugin = null;
+            };
+
+            PluginPanel.Children.Add(button);
+        }
+
 
     }
 }
